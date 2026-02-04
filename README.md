@@ -4,9 +4,17 @@
 
 **Oculus Geometry** es un instrumento visual interactivo y contemplativo enfocado en geometría, tiempo y movimiento matemático.
 
-Está concebido como un sistema mínimo: sin narrativa, sin gamificación, sin significados externos impuestos — solo estructura, ritmo y forma.
+El proyecto funciona como una pieza perceptual viva: un espacio donde formas, órbitas y relaciones numéricas se despliegan sin narrativa impuesta, invitando a la observación, la pausa y la interpretación personal.
 
-Este repositorio contiene una **versión demo pública**, destinada a visualización, ejecución y estudio a nivel conceptual.
+Este repositorio corresponde a una versión demostrativa y abierta, pensada para:
+
+Documentar el comportamiento visual del sistema
+
+Compartir una experiencia geométrica interactiva
+
+Servir como base experimental y contemplativa
+
+El núcleo conceptual y evolutivo del sistema forma parte de una línea de investigación más amplia y no se encuentra expuesto en este repositorio.
 
 ---
 
