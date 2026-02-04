@@ -1,0 +1,1797 @@
+/*
+Oculus Geometry
+© 2025 Cristian Valeria Bravo
+
+Developed under the Hermetica Labs project
+
+Licensed under Creative Commons BY-NC-ND 4.0
+This work may be viewed and executed, but not modified or used commercially
+without explicit permission from the author.
+*/
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OCULUS GEOMETRY</title>
+<style>
+  body { 
+    margin: 0; 
+    overflow: hidden; 
+    background: #050505; 
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+  }
+
+  #ui {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    z-index: 10;
+    color: #e0c097;
+    background: rgba(15, 15, 15, 0.92);
+    padding: 20px;
+    border: 1px solid #5d4a37;
+    border-radius: 12px;
+    width: 280px;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 10px 40px rgba(0,0,0,0.7);
+    max-height: 85vh;
+    overflow-y: auto;
+    transition: transform 0.5s ease;
+  }
+
+  h1 { 
+    font-size: 18px; 
+    margin: 0 0 15px 0; 
+    font-weight: 300; 
+    letter-spacing: 2px; 
+    text-align: center; 
+    border-bottom: 1px solid #5d4a37; 
+    padding-bottom: 10px;
+    color: #d4af37;
+  }
+  
+  h2 {
+    font-size: 11px;
+    margin: 15px 0 10px 0;
+    font-weight: 400;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #8a7662;
+    border-bottom: 1px solid #3d342a;
+    padding-bottom: 5px;
+  }
+  
+  .control-group { margin-bottom: 15px; }
+  .label-row { 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    margin-bottom: 8px; 
+    font-size: 13px; 
+  }
+  
+  label { cursor: pointer; display: flex; align-items: center; }
+  input[type="checkbox"] { margin-right: 10px; accent-color: #e0c097; }
+  
+  input[type="file"] {
+    width: 100%;
+    font-size: 10px;
+    padding: 5px;
+    margin: 5px 0;
+    border: 1px solid #5d4a37;
+    border-radius: 4px;
+    background: #2a241e;
+    color: #e0c097;
+  }
+  
+  .slider-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    color: #8a7662;
+    margin-bottom: 3px;
+  }
+  
+  input[type="range"] {
+    width: 100%;
+    margin: 5px 0;
+    accent-color: #e0c097;
+  }
+
+  button {
+    background: #2a241e;
+    color: #e0c097;
+    border: 1px solid #5d4a37;
+    padding: 8px 14px;
+    margin: 3px;
+    cursor: pointer;
+    border-radius: 6px;
+    font-size: 16px;
+    transition: all 0.3s;
+    user-select: none;
+  }
+  button:hover { background: #3d342a; border-color: #e0c097; }
+  button:active { transform: scale(0.95); }
+
+  hr { border: 0; border-top: 1px solid #5d4a37; margin: 15px 0; }
+  small { color: #8a7662; font-size: 10px; text-transform: uppercase; letter-spacing: 1px; }
+  
+  #clock { 
+    font-family: 'Courier New', Courier, monospace; 
+    color: #d4af37; 
+    font-size: 14px; 
+    text-align: center; 
+    display: block; 
+    margin-top: 10px; 
+  }
+  
+  .legend { 
+    font-size: 11px; 
+    color: #8a7662; 
+    margin-top: 10px; 
+    line-height: 1.5;
+    padding: 10px;
+    background: rgba(0,0,0,0.3);
+    border-radius: 6px;
+  }
+  
+  .value-display {
+    color: #d4af37;
+    font-weight: 500;
+  }
+  
+  .palette-btn {
+    flex: 1;
+    padding: 8px;
+    font-size: 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.3s;
+    border: 1px solid #5d4a37;
+    background: #2a241e;
+    color: #e0c097;
+    margin: 2px;
+  }
+  
+  .palette-btn.active {
+    font-weight: 600;
+    transform: scale(1.05);
+    border-width: 2px;
+  }
+  
+  .palette-selector {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 5px;
+    margin-top: 8px;
+  }
+  
+  #timeControls {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10;
+    display: flex;
+    gap: 10px;
+    background: rgba(15, 15, 15, 0.92);
+    padding: 10px 15px;
+    border-radius: 50px;
+    border: 1px solid #5d4a37;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+    transition: transform 0.5s ease;
+  }
+  
+  #timeControls button {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    font-size: 20px;
+    margin: 0;
+  }
+  
+  #timeControls button.active {
+    background: #d4af37;
+    color: #2a241e;
+    border-color: #d4af37;
+  }
+  
+  #timeControls button:hover:not(.active) {
+    background: rgba(212, 175, 55, 0.2);
+    border-color: #d4af37;
+  }
+  
+  #uiToggleBtn {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: rgba(15, 15, 15, 0.92);
+    color: #d4af37;
+    border: 2px solid #5d4a37;
+    cursor: pointer;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+    transition: all 0.3s ease;
+    z-index: 101;
+  }
+  
+  #uiToggleBtn:hover {
+    background: rgba(212, 175, 55, 0.3);
+    border-color: #d4af37;
+    transform: scale(1.1);
+  }
+  
+  #uiToggleBtn:active {
+    transform: scale(0.95);
+  }
+  
+ 
+  #timeControlsToggleBtn {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: rgba(15, 15, 15, 0.92);
+    color: #d4af37;
+    border: 2px solid #5d4a37;
+    cursor: pointer;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+    transition: all 0.3s ease;
+    z-index: 9;
+    display: none;
+  }
+  
+  #timeControlsToggleBtn:hover {
+    background: rgba(212, 175, 55, 0.3);
+    border-color: #d4af37;
+    transform: translateX(-50%) scale(1.1);
+  }
+  
+  #timeControlsToggleBtn:active {
+    transform: translateX(-50%) scale(0.95);
+  }
+  
+
+  #fullscreenBtn {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 100;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: rgba(15, 15, 15, 0.92);
+    color: #d4af37;
+    border: 2px solid #5d4a37;
+    cursor: pointer;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+    transition: all 0.3s ease;
+  }
+  
+  #fullscreenBtn:hover {
+    background: rgba(212, 175, 55, 0.3);
+    border-color: #d4af37;
+    transform: scale(1.1);
+  }
+  
+  #fullscreenBtn:active {
+    transform: scale(0.95);
+  }
+  
+  #fullscreenBtn.hidden {
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(-100px);
+  }
+  
+  .audio-visualizer {
+    margin-top: 10px;
+    padding: 10px;
+    border-radius: 6px;
+    background: rgba(30, 20, 10, 0.3);
+    border: 1px solid #5d4a37;
+  }
+  
+  .audio-bar {
+    height: 4px;
+    background: linear-gradient(to right, #5d4a37, #d4af37);
+    border-radius: 2px;
+    transition: width 0.1s;
+    margin-top: 5px;
+  }
+
+
+  #ui::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  #ui::-webkit-scrollbar-track {
+    background: rgba(0,0,0,0.3);
+    border-radius: 10px;
+  }
+
+  #ui::-webkit-scrollbar-thumb {
+    background: #5d4a37;
+    border-radius: 10px;
+  }
+
+  #ui::-webkit-scrollbar-thumb:hover {
+    background: #8a7662;
+  }
+  
+
+  #ui.hidden {
+    transform: translateX(-320px);
+  }
+  
+  #timeControls.hidden {
+    transform: translate(-50%, 100px);
+  }
+  
+ 
+  #tutorialOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(5, 5, 5, 0.98);
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: #e0c097;
+    padding: 15px;
+    text-align: center;
+    transition: opacity 0.5s ease;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  #tutorialContent {
+    max-width: 95%;
+    width: 500px;
+    background: rgba(15, 15, 15, 0.98);
+    border: 1px solid #5d4a37;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.7);
+    margin: auto;
+  }
+  
+  #tutorialContent h2 {
+    font-size: 24px;
+    color: #d4af37;
+    margin-bottom: 20px;
+    border: none;
+  }
+  
+  .tutorial-step {
+    margin: 20px 0;
+    font-size: 16px;
+    line-height: 1.6;
+  }
+  
+  .tutorial-step h3 {
+    color: #d4af37;
+    font-size: 18px;
+    margin-bottom: 10px;
+  }
+  
+  .tutorial-controls {
+    display: flex;
+    gap: 15px;
+    margin-top: 30px;
+    justify-content: center;
+  }
+  
+  .tutorial-controls button {
+    min-width: 120px;
+  }
+  
+  .astro-controls-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+  
+  .astro-name {
+    flex: 1;
+    font-size: 13px;
+  }
+  
+  .astro-checkboxes {
+    display: flex;
+    gap: 15px;
+  }
+  
+  .color-intensity-selector {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+  }
+  
+  .color-intensity-btn {
+    flex: 1;
+    padding: 8px;
+    text-align: center;
+    background: #2a241e;
+    border: 1px solid #5d4a37;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-size: 11px;
+  }
+  
+  .color-intensity-btn.active {
+    background: #d4af37;
+    color: #2a241e;
+    border-color: #d4af37;
+  }
+  
+  .tutorial-highlight {
+    color: #d4af37;
+    font-weight: bold;
+  }
+  
+  /* Para móviles más pequeños */
+  @media (max-width: 768px) {
+    #tutorialContent {
+      width: 90%;
+      padding: 15px;
+      max-height: 85vh;
+      overflow-y: auto;
+    }
+    
+    #tutorialContent h2 {
+      font-size: 20px;
+      margin-bottom: 15px;
+    }
+    
+    .tutorial-step {
+      margin: 15px 0;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+    
+    .tutorial-step h3 {
+      font-size: 16px;
+      margin-bottom: 8px;
+    }
+    
+    .tutorial-controls {
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 20px;
+    }
+    
+    .tutorial-controls button {
+      min-width: 100%;
+      padding: 12px;
+    }
+  }
+  
+  /* Para móviles muy pequeños */
+  @media (max-width: 480px) {
+    #tutorialContent {
+      padding: 12px;
+      width: 95%;
+    }
+    
+    #tutorialContent h2 {
+      font-size: 18px;
+    }
+    
+    .tutorial-step {
+      margin: 12px 0;
+      font-size: 13px;
+    }
+    
+    .tutorial-step h3 {
+      font-size: 15px;
+    }
+    
+    .legend {
+      font-size: 10px;
+      padding: 8px;
+    }
+  }
+  
+  /* Ajustes específicos para orientación horizontal en móviles */
+  @media (max-height: 500px) and (orientation: landscape) {
+    #tutorialContent {
+      max-height: 90vh;
+      padding: 10px;
+    }
+    
+    #tutorialContent h2 {
+      font-size: 16px;
+      margin-bottom: 10px;
+    }
+    
+    .tutorial-step {
+      margin: 8px 0;
+      font-size: 12px;
+    }
+    
+    .tutorial-step h3 {
+      font-size: 14px;
+      margin-bottom: 5px;
+    }
+  }
+</style>
+</head>
+<body>
+
+
+<div id="tutorialOverlay">
+  <div id="tutorialContent">
+    <h2>OCULUS GEOMETRY</h2>
+    
+    <div class="tutorial-step">
+      <h3>🎨 Paletas de Color</h3>
+      <p>10 paletas desde <span class="tutorial-highlight">clásico</span> hasta <span class="tutorial-highlight">energía pura</span>.</p>
+    </div>
+    
+    <div class="tutorial-step">
+      <h3>✨ Control de Astros</h3>
+      <p>Cada astro tiene controles separados para <span class="tutorial-highlight">planeta</span> y <span class="tutorial-highlight">estela</span>.</p>
+    </div>
+    
+    <div class="tutorial-step">
+      <h3>⚙️ Instrumento</h3>
+      <p>Activa/desactiva <span class="tutorial-highlight">Rete</span>, <span class="tutorial-highlight">Limbo</span> y <span class="tutorial-highlight">Eclíptica</span>.</p>
+    </div>
+    
+    <div class="tutorial-step">
+      <h3>🎵 Audio Reactivo</h3>
+      <p>Carga música MP3 y activa la <span class="tutorial-highlight">audio-reactividad</span>.</p>
+    </div>
+    
+    <div class="tutorial-step">
+      <h3>⏱ Controles de Tiempo</h3>
+      <p>Usa los botones inferiores para <span class="tutorial-highlight">acelerar</span> o <span class="tutorial-highlight">contemplar</span>.</p>
+    </div>
+    
+    <div class="tutorial-controls">
+      <button id="skipTutorialBtn">Saltar</button>
+      <button id="startTutorialBtn">Comenzar</button>
+    </div>
+    
+    <div class="legend" style="margin-top: 15px; font-size: 10px;">
+      <strong style="color: #d4af37;">oculus geometry</strong><br>
+      Instrumento audiovisual generativo<br>
+      © 2025 Cristian Valeria Bravo
+    </div>
+  </div>
+</div>
+
+
+<button id="uiToggleBtn" title="Ocultar Panel">«</button>
+
+
+<button id="timeControlsToggleBtn" title="Mostrar Controles">⌃</button>
+
+
+<div id="ui">
+  <h1>OCULUS GEOMETRY</h1>
+  
+
+  <h2>🎨 Paleta de Color</h2>
+  <div class="control-group">
+    <div class="palette-selector">
+      <div class="palette-btn active" data-palette="clasico">Clásico</div>
+      <div class="palette-btn" data-palette="neon">Neón</div>
+      <div class="palette-btn" data-palette="fuego">Fuego</div>
+      <div class="palette-btn" data-palette="oceano">Océano</div>
+      <div class="palette-btn" data-palette="aurora">Aurora</div>
+      <div class="palette-btn" data-palette="purpura">Púrpura</div>
+      <div class="palette-btn" data-palette="blackwhite">B/N</div>
+      <div class="palette-btn" data-palette="whiteblack">N/B</div>
+      <div class="palette-btn" data-palette="psicodelico">Psicodélico</div>
+      <div class="palette-btn" data-palette="energia">Energía</div>
+    </div>
+    
+    <div class="slider-label" style="margin-top: 10px;">
+      <span>Intensidad de Color</span>
+      <span class="value-display" id="colorIntensityValue">100%</span>
+    </div>
+    <input type="range" id="colorIntensity" min="20" max="200" value="100" step="10">
+  </div>
+
+  <hr>
+
+
+  <h2>🎵 Audio y Música</h2>
+  <div class="control-group">
+    <label>
+      <input type="checkbox" id="audioReactive"> Audio-Reactividad
+    </label>
+    
+    <div style="margin-top: 10px;">
+      <small style="display: block; margin-bottom: 5px;">Cargar MP3</small>
+      <input type="file" id="musicFile" accept="audio/*">
+    </div>
+    
+    <div style="margin-top: 10px; display: flex; gap: 5px;">
+      <button id="playMusicBtn" style="flex: 1;" disabled>▶️ Play</button>
+      <button id="stopMusicBtn" style="flex: 1;" disabled>⏹ Stop</button>
+    </div>
+    
+    <div class="slider-label" style="margin-top: 10px;">
+      <span>Sensibilidad Audio</span>
+      <span class="value-display" id="audioSensitivityValue">100%</span>
+    </div>
+    <input type="range" id="audioSensitivity" min="20" max="300" value="100" step="10">
+    
+    <div class="audio-visualizer" id="audioVisualizer" style="display: none;">
+      <small>Nivel de Audio</small>
+      <div class="audio-bar" id="audioBar" style="width: 0%;"></div>
+    </div>
+  </div>
+
+  <hr>
+
+ 
+  <h2>⚙️ Instrumento</h2>
+  <div class="control-group">
+    <label><input type="checkbox" id="showRete"> Rete (Red Estelar)</label>
+    <label><input type="checkbox" id="showLimbo"> Limbo Graduado</label>
+    <label><input type="checkbox" id="showEcliptic"> Eclíptica Áurea</label>
+    
+    <div class="slider-label" style="margin-top: 10px;">
+      <span>Separación Orbital</span>
+      <span class="value-display" id="orbitalSeparationValue">1.0</span>
+    </div>
+    <input type="range" id="orbitalSeparation" min="0.5" max="3.0" value="1.0" step="0.1">
+  </div>
+
+  <hr>
+
+
+  <h2>✨ Astros</h2>
+  <div class="control-group">
+    <div id="astroControls"></div>
+    
+    <div style="margin-top: 10px;">
+      <small style="display: block; margin-bottom: 5px;">Intensidad de Color</small>
+      <div class="color-intensity-selector">
+        <div class="color-intensity-btn active" data-intensity="light">Light</div>
+        <div class="color-intensity-btn" data-intensity="medium">Medium</div>
+        <div class="color-intensity-btn" data-intensity="high">High</div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="slider-label" style="margin-top: 10px;">
+    <span>Longitud de Estelas</span>
+    <span class="value-display" id="trailLengthValue">300</span>
+  </div>
+  <input type="range" id="trailLength" min="50" max="1000" value="300" step="50">
+  
+  <div class="slider-label" style="margin-top: 10px;">
+    <span>Opacidad de Estelas</span>
+    <span class="value-display" id="trailOpacityValue">30%</span>
+  </div>
+  <input type="range" id="trailOpacity" min="10" max="100" value="30" step="5">
+
+  <hr>
+
+
+  <h2>⏱️ Tiempo</h2>
+  <div class="control-group">
+    <div id="clock">00:00:00</div>
+    <small style="display: block; text-align: center; margin-top: 5px;">
+      Velocidad: <span class="value-display" id="timeScaleDisplay">1.0x</span>
+    </small>
+  </div>
+
+  <div class="legend">
+    <strong style="color: #d4af37;">oculus geometry</strong><br>
+    Oculus Geometry es un instrumento audiovisual generativo en desarrollo.
+    © 2025 Cristian Valeria Bravo<br>
+    Licensed under Creative Commons BY-NC-ND 4.0<br>
+  
+  </div>
+</div>
+
+
+<div id="timeControls">
+  <button id="aureoBtn" title="Aceleración Áurea (×Φ)">△</button>
+  <button id="autoBtn" title="Modo Automático">✕</button>
+  <button id="globalBtn" class="active" title="Aceleración Global (×2)">▽</button>
+  <button id="slowBtn" title="Desaceleración (÷2)">—</button>
+  <button id="contemplativeBtn" title="Modo Contemplativo">●</button>
+</div>
+
+
+<button id="fullscreenBtn" title="Pantalla Completa (F11)">⛶</button>
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.min.js"></script>
+
+<script>
+
+const PHI = 1.61803398875;
+const BASE_RADIUS = 8;
+let TIME_SCALE = 1;
+let SIM_TIME = 0;
+
+
+let ACCELERATION_MODE = 'global';
+let AUTO_ACCELERATION_INTERVAL = null;
+let AUTO_SPEED_MULTIPLIER = 1;
+
+
+let CURRENT_PALETTE = 'clasico';
+let COLOR_INTENSITY = 1.0;
+let TRAIL_LENGTH = 300;
+let TRAIL_OPACITY = 0.3;
+let ORBITAL_SEPARATION = 1.0;
+let COLOR_INTENSITY_LEVEL = 'light';
+
+
+let AUDIO_REACTIVE = false;
+let AUDIO_SENSITIVITY = 1.0;
+let audioContext = null;
+let audioAnalyser = null;
+let audioDataArray = null;
+let audioSource = null;
+let musicElement = null;
+let isMusicPlaying = false;
+
+
+let uiVisible = true;
+let timeControlsVisible = true;
+let panelManuallyHidden = false;
+let lastMouseMoveTime = Date.now();
+let lastCameraMoveTime = Date.now();
+let uiHideTimeout = null;
+let timeControlsHideTimeout = null;
+let isFullscreen = false;
+const UI_HIDE_DELAY = 3000; 
+const TIME_CONTROLS_HIDE_DELAY = 5000; 
+
+
+let CONTEMPLATIVE_MODE = false;
+let contemplativePhase = 0;
+let contemplativeDistance = 120; 
+let contemplativeZenithAngle = Math.PI/2 - 0.1; 
+let contemplativeAzimuthAngle = 0;
+let contemplativeTargetDistance = 120;
+let contemplativeTargetZenith = Math.PI/2 - 0.1; 
+let contemplativeTargetAzimuth = 0;
+let contemplativeViewMode = 0; 
+let contemplativeViewTimer = 0;
+let contemplativeZoomPhase = 0;
+
+const CONTEMPLATIVE_SPEED = 0.00005;
+const ZOOM_SPEED = 0.0001;
+const VIEW_CHANGE_INTERVAL = 45000;
+const SMOOTHING_FACTOR = 0.008;
+const CENITAL_SMOOTHING = 0.003;
+
+
+const COLOR_PALETTES = {
+  clasico: {
+    moon: 0xeeeeee,
+    mercury: 0xffdd99,
+    venus: 0xff99bb,
+    sun: 0xffff77,
+    mars: 0xff7744,
+    jupiter: 0xe5c9a1,
+    saturn: 0xdfd5b6,
+    trail: 0.6,
+    emissive: 0.7
+  },
+  neon: {
+    moon: 0x00ffff,
+    mercury: 0xffff00,
+    venus: 0xff00ff,
+    sun: 0xffff00,
+    mars: 0xff0000,
+    jupiter: 0x00ffff,
+    saturn: 0x9900ff,
+    trail: 0.6,
+    emissive: 0.8
+  },
+  fuego: {
+    moon: 0xffaa55,
+    mercury: 0xff8844,
+    venus: 0xff6633,
+    sun: 0xffdd00,
+    mars: 0xff3300,
+    jupiter: 0xff9944,
+    saturn: 0xffbb55,
+    trail: 0.5,
+    emissive: 0.6
+  },
+  oceano: {
+    moon: 0xaaddff,
+    mercury: 0x66ccff,
+    venus: 0x4488ff,
+    sun: 0x88ddff,
+    mars: 0x3366ff,
+    jupiter: 0x5599ff,
+    saturn: 0x77aaff,
+    trail: 0.4,
+    emissive: 0.5
+  },
+  aurora: {
+    moon: 0xaaffcc,
+    mercury: 0x88ffaa,
+    venus: 0xffaa88,
+    sun: 0xffffaa,
+    mars: 0xffaacc,
+    jupiter: 0xaaccff,
+    saturn: 0xccaaff,
+    trail: 0.5,
+    emissive: 0.7
+  },
+  purpura: {
+    moon: 0xccaaff,
+    mercury: 0xaa88ff,
+    venus: 0xff88cc,
+    sun: 0xffaaff,
+    mars: 0xff66aa,
+    jupiter: 0xcc88ff,
+    saturn: 0x9966ff,
+    trail: 0.5,
+    emissive: 0.6
+  },
+  blackwhite: {
+    moon: 0xffffff,
+    mercury: 0xdddddd,
+    venus: 0xbbbbbb,
+    sun: 0xffffff,
+    mars: 0x999999,
+    jupiter: 0x777777,
+    saturn: 0x555555,
+    trail: 0.8,
+    emissive: 0.3
+  },
+  whiteblack: {
+    moon: 0x000000,
+    mercury: 0x222222,
+    venus: 0x444444,
+    sun: 0x000000,
+    mars: 0x666666,
+    jupiter: 0x888888,
+    saturn: 0xaaaaaa,
+    trail: 0.8,
+    emissive: 0.3
+  },
+  psicodelico: {
+    moon: 0xff00ff,
+    mercury: 0x00ffff,
+    venus: 0xffff00,
+    sun: 0xff0000,
+    mars: 0x00ff00,
+    jupiter: 0x0000ff,
+    saturn: 0xff0088,
+    trail: 0.9,
+    emissive: 1.0
+  },
+  energia: {
+    moon: 0x88ffff,
+    mercury: 0xffff88,
+    venus: 0xff88ff,
+    sun: 0xffff00,
+    mars: 0xff8888,
+    jupiter: 0x88ff88,
+    saturn: 0x8888ff,
+    trail: 1.0,
+    emissive: 2.0
+  }
+};
+
+
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 5000);
+const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setPixelRatio(window.devicePixelRatio);
+renderer.setClearColor(0x050505, 1);
+document.body.appendChild(renderer.domElement);
+
+const controls = new THREE.OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+controls.dampingFactor = 0.05;
+camera.position.set(80, 60, 80);
+controls.update();
+
+/* === MATERIALES === */
+let matBrass, matGoldLine, matEcliptic;
+
+function updateMaterials() {
+  const intensity = COLOR_INTENSITY;
+  
+  matBrass = new THREE.MeshStandardMaterial({ 
+    color: 0xb5a642, 
+    metalness: 1.0, 
+    roughness: 0.2,
+    emissive: 0x221100,
+    emissiveIntensity: 0.1 * intensity
+  });
+  
+  matGoldLine = new THREE.LineBasicMaterial({ 
+    color: 0xe0c097, 
+    transparent: true, 
+    opacity: 0.4 * intensity
+  });
+  
+  matEcliptic = new THREE.LineBasicMaterial({ 
+    color: 0xffaa44, 
+    transparent: true, 
+    opacity: 0.6 * intensity
+  });
+}
+
+updateMaterials();
+
+function createLimbo() {
+  const group = new THREE.Group();
+  const radius = BASE_RADIUS * Math.pow(PHI, 7.5);
+  
+  const torusGeom = new THREE.TorusGeometry(radius, 0.2, 16, 100);
+  const torus = new THREE.Mesh(torusGeom, matBrass);
+  torus.rotation.x = Math.PI / 2;
+  group.add(torus);
+
+  for (let i = 0; i < 360; i += 5) {
+    const angle = (i * Math.PI) / 180;
+    const isMajor = i % 15 === 0;
+    const len = isMajor ? 2 : 1;
+    const points = [
+      new THREE.Vector3(Math.cos(angle) * radius, 0, Math.sin(angle) * radius),
+      new THREE.Vector3(Math.cos(angle) * (radius + len), 0, Math.sin(angle) * (radius + len))
+    ];
+    const geom = new THREE.BufferGeometry().setFromPoints(points);
+    group.add(new THREE.Line(geom, matGoldLine));
+  }
+  scene.add(group);
+  return group;
+}
+
+function createRete() {
+  const group = new THREE.Group();
+  const maxR = BASE_RADIUS * Math.pow(PHI, 7.5);
+  
+  for (let alt = 0; alt <= 90; alt += 15) {
+    const r = maxR * Math.tan((90 - alt) * Math.PI / 360);
+    const curve = new THREE.EllipseCurve(0, 0, r, r);
+    const points = curve.getPoints(128);
+    const geom = new THREE.BufferGeometry().setFromPoints(points.map(p => new THREE.Vector3(p.x, 0, p.y)));
+    const line = new THREE.Line(geom, matGoldLine);
+    group.add(line);
+  }
+
+  for (let az = 0; az < 360; az += 30) {
+    const angle = (az * Math.PI) / 180;
+    const points = [
+      new THREE.Vector3(0, 0, 0),
+      new THREE.Vector3(Math.cos(angle) * maxR, 0, Math.sin(angle) * maxR)
+    ];
+    const geom = new THREE.BufferGeometry().setFromPoints(points);
+    group.add(new THREE.Line(geom, matGoldLine));
+  }
+
+  const supportGeom = new THREE.RingGeometry(maxR * 0.98, maxR, 64);
+  const support = new THREE.Mesh(supportGeom, matBrass);
+  support.rotation.x = Math.PI / 2;
+  group.add(support);
+
+  scene.add(group);
+  return group;
+}
+
+function createEcliptic() {
+  const r = BASE_RADIUS * Math.pow(PHI, 4);
+  const curve = new THREE.EllipseCurve(0, 0, r, r);
+  const points = curve.getPoints(128);
+  const geom = new THREE.BufferGeometry().setFromPoints(points.map(p => new THREE.Vector3(p.x, 0, p.y)));
+  const line = new THREE.Line(geom, matEcliptic);
+  line.rotation.x = THREE.MathUtils.degToRad(23.5);
+  scene.add(line);
+  return line;
+}
+
+const limbo = createLimbo();
+const rete = createRete();
+const ecliptic = createEcliptic();
+
+
+const astros = [
+  { name: 'Luna',     id: 'moon',    size: 0.6, idx: 1, tropicPeriod: 27.3,   aureoPhase: 0 },
+  { name: 'Mercurio', id: 'mercury', size: 0.4, idx: 2, tropicPeriod: 88,     aureoPhase: PHI },
+  { name: 'Venus',    id: 'venus',   size: 0.7, idx: 3, tropicPeriod: 224.7,  aureoPhase: PHI * 2 },
+  { name: 'Sol',      id: 'sun',     size: 1.2, idx: 4, tropicPeriod: 365.25, aureoPhase: PHI * 3 },
+  { name: 'Marte',    id: 'mars',    size: 0.7, idx: 5, tropicPeriod: 687,    aureoPhase: PHI * 4 },
+  { name: 'Júpiter',  id: 'jupiter', size: 1.5, idx: 6, tropicPeriod: 4333,   aureoPhase: PHI * 5 },
+  { name: 'Saturno',  id: 'saturn',  size: 1.3, idx: 7, tropicPeriod: 10759,  aureoPhase: PHI * 6 }
+];
+
+const bodies = {};
+const astroContainer = document.getElementById('astroControls');
+
+function applyPalette(palette) {
+  const colors = COLOR_PALETTES[palette];
+  
+  let intensityMultiplier = 1.0;
+  switch(COLOR_INTENSITY_LEVEL) {
+    case 'light': intensityMultiplier = 0.6; break;
+    case 'medium': intensityMultiplier = 1.0; break;
+    case 'high': intensityMultiplier = 1.5; break;
+  }
+  
+  astros.forEach(a => {
+    const b = bodies[a.id];
+    const color = colors[a.id];
+    
+    b.mesh.material.color.setHex(color);
+    b.mesh.material.emissive.setHex(color);
+    b.mesh.material.emissiveIntensity = colors.emissive * COLOR_INTENSITY * intensityMultiplier;
+    b.trailLine.material.color.setHex(color);
+    b.trailLine.material.opacity = colors.trail * TRAIL_OPACITY * COLOR_INTENSITY * intensityMultiplier;
+    b.baseColor = color;
+  });
+}
+
+astros.forEach(a => {
+  const geom = new THREE.SphereGeometry(a.size, 32, 32);
+  const mat = new THREE.MeshStandardMaterial({ 
+    color: COLOR_PALETTES.clasico[a.id], 
+    emissive: COLOR_PALETTES.clasico[a.id], 
+    emissiveIntensity: 0.7,
+    metalness: 0.5,
+    roughness: 0.2
+  });
+  const mesh = new THREE.Mesh(geom, mat);
+  mesh.userData.originalSize = a.size;
+  scene.add(mesh);
+
+  const trailGeom = new THREE.BufferGeometry();
+  const trailMat = new THREE.LineBasicMaterial({ 
+    color: COLOR_PALETTES.clasico[a.id], 
+    transparent: true, 
+    opacity: 0.6 
+  });
+  const trailLine = new THREE.Line(trailGeom, trailMat);
+  scene.add(trailLine);
+
+  bodies[a.id] = {
+    mesh,
+    trailLine,
+    trailPoints: [],
+    radius: BASE_RADIUS * Math.pow(PHI, a.idx),
+    idx: a.idx,
+    planetVisible: true,
+    trailVisible: true,
+    tropicPeriod: a.tropicPeriod,
+    aureoPhase: a.aureoPhase,
+    baseColor: COLOR_PALETTES.clasico[a.id],
+    originalSize: a.size
+  };
+
+  const div = document.createElement('div');
+  div.className = 'astro-controls-row';
+  div.innerHTML = `
+    <span class="astro-name">${a.name}</span>
+    <div class="astro-checkboxes">
+      <label title="Mostrar/Ocultar Planeta">
+        <input type="checkbox" checked id="planet_${a.id}"> 🌍
+      </label>
+      <label title="Mostrar/Ocultar Estela">
+        <input type="checkbox" checked id="trail_${a.id}"> 🌠
+      </label>
+    </div>
+  `;
+  astroContainer.appendChild(div);
+  
+  document.getElementById(`planet_${a.id}`).onchange = (e) => {
+    bodies[a.id].planetVisible = e.target.checked;
+    mesh.visible = e.target.checked;
+  };
+  
+  document.getElementById(`trail_${a.id}`).onchange = (e) => {
+    bodies[a.id].trailVisible = e.target.checked;
+    trailLine.visible = e.target.checked;
+  };
+});
+
+const sunLight = new THREE.PointLight(0xffffff, 2, 1000);
+scene.add(sunLight);
+scene.add(new THREE.AmbientLight(0x404040, 1));
+
+function initAudioContext() {
+  if (!audioContext) {
+    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    audioAnalyser = audioContext.createAnalyser();
+    audioAnalyser.fftSize = 256;
+    const bufferLength = audioAnalyser.frequencyBinCount;
+    audioDataArray = new Uint8Array(bufferLength);
+  }
+}
+
+function getAudioData() {
+  if (!audioAnalyser || !AUDIO_REACTIVE) {
+    return { bass: 0, mid: 0, treble: 0, average: 0, peak: 0 };
+  }
+  
+  audioAnalyser.getByteFrequencyData(audioDataArray);
+  
+  const bass = audioDataArray.slice(0, 10).reduce((a, b) => a + b, 0) / 10 / 255;
+  const mid = audioDataArray.slice(10, 30).reduce((a, b) => a + b, 0) / 20 / 255;
+  const treble = audioDataArray.slice(30, 60).reduce((a, b) => a + b, 0) / 30 / 255;
+  const average = audioDataArray.reduce((a, b) => a + b, 0) / audioDataArray.length / 255;
+  const peak = Math.max(...audioDataArray) / 255;
+  
+  return { 
+    bass: bass, 
+    mid: mid, 
+    treble: treble, 
+    average: average,
+    peak: peak
+  };
+}
+
+function toggleUI() {
+  const ui = document.getElementById('ui');
+  const uiToggleBtn = document.getElementById('uiToggleBtn');
+  const isHidden = ui.classList.contains('hidden');
+  
+  if (isHidden) {
+    ui.classList.remove('hidden');
+    uiToggleBtn.innerHTML = '«';
+    uiToggleBtn.title = 'Ocultar Panel';
+    uiVisible = true;
+    resetUITimer();
+  } else {
+    ui.classList.add('hidden');
+    uiToggleBtn.innerHTML = '»';
+    uiToggleBtn.title = 'Mostrar Panel';
+    uiVisible = false;
+  }
+}
+
+function toggleTimeControls() {
+  const timeControls = document.getElementById('timeControls');
+  const timeControlsToggleBtn = document.getElementById('timeControlsToggleBtn');
+  const isHidden = timeControls.classList.contains('hidden');
+  
+  if (isHidden) {
+    timeControls.classList.remove('hidden');
+    timeControlsToggleBtn.style.display = 'none';
+    timeControlsVisible = true;
+    resetTimeControlsTimer();
+  } else {
+    timeControls.classList.add('hidden');
+    timeControlsToggleBtn.style.display = 'flex';
+    timeControlsVisible = false;
+  }
+}
+
+function resetUITimer() {
+  lastMouseMoveTime = Date.now();
+  if (!uiVisible) return;
+  
+  if (uiHideTimeout) {
+    clearTimeout(uiHideTimeout);
+  }
+  
+  uiHideTimeout = setTimeout(() => {
+    if (uiVisible) {
+      toggleUI();
+    }
+  }, UI_HIDE_DELAY);
+}
+
+function resetTimeControlsTimer() {
+  if (!timeControlsVisible) return;
+  
+  if (timeControlsHideTimeout) {
+    clearTimeout(timeControlsHideTimeout);
+  }
+  
+  timeControlsHideTimeout = setTimeout(() => {
+    if (timeControlsVisible) {
+      toggleTimeControls();
+    }
+  }, TIME_CONTROLS_HIDE_DELAY);
+}
+
+
+function toggleContemplativeMode() {
+  CONTEMPLATIVE_MODE = !CONTEMPLATIVE_MODE;
+  const contemplativeBtn = document.getElementById('contemplativeBtn');
+  
+  if (CONTEMPLATIVE_MODE) {
+    contemplativeBtn.classList.add('active');
+    contemplativeBtn.title = 'Desactivar Modo Contemplativo';
+    controls.enabled = false;
+    
+    contemplativeDistance = 120;
+    contemplativeZenithAngle = Math.PI/2 - 0.1;
+    contemplativeAzimuthAngle = 0;
+    contemplativePhase = 0;
+    contemplativeViewMode = 0;
+    contemplativeViewTimer = 0;
+    contemplativeZoomPhase = 0;
+    
+    setNewContemplativeTarget();
+    
+    console.log('Modo contemplativo activado - Enfocado en vistas cenitales');
+  } else {
+    contemplativeBtn.classList.remove('active');
+    contemplativeBtn.title = 'Modo Contemplativo';
+    controls.enabled = true;
+    console.log('Modo contemplativo desactivado');
+  }
+}
+
+function setNewContemplativeTarget() {
+  contemplativeViewTimer++;
+  
+  if (contemplativeViewTimer > VIEW_CHANGE_INTERVAL / 60) {
+    contemplativeViewTimer = 0;
+    contemplativeViewMode = (contemplativeViewMode + 1) % 4;
+  }
+  
+  switch(contemplativeViewMode) {
+    case 0:
+      contemplativeTargetAzimuth += CONTEMPLATIVE_SPEED * 100;
+      contemplativeTargetZenith = Math.PI/2 - 0.1;
+      contemplativeTargetDistance = 120 + Math.sin(contemplativeZoomPhase * 0.5) * 5;
+      break;
+      
+    case 1:
+      contemplativeTargetAzimuth += CONTEMPLATIVE_SPEED * 80;
+      contemplativeTargetZenith = -Math.PI/2 + 0.1;
+      contemplativeTargetDistance = 110 + Math.cos(contemplativeZoomPhase * 0.6) * 8;
+      break;
+      
+    case 2:
+      contemplativeTargetAzimuth += CONTEMPLATIVE_SPEED * 60;
+      contemplativeTargetZenith = Math.PI/2 - 0.15;
+      contemplativeTargetDistance = 60 + Math.sin(contemplativeZoomPhase * 0.8) * 15;
+      break;
+      
+    case 3:
+      contemplativeTargetAzimuth += CONTEMPLATIVE_SPEED * 40;
+      contemplativeTargetZenith = Math.PI/2 - 0.05;
+      contemplativeTargetDistance = 150 + Math.cos(contemplativeZoomPhase * 0.4) * 20;
+      break;
+  }
+  
+  contemplativeZoomPhase += ZOOM_SPEED * 50;
+  
+  if (contemplativeViewMode === 0 || contemplativeViewMode === 2 || contemplativeViewMode === 3) {
+    contemplativeTargetZenith = Math.max(Math.PI/2 - 0.2, Math.min(Math.PI/2 - 0.05, contemplativeTargetZenith));
+  } else if (contemplativeViewMode === 1) {
+    contemplativeTargetZenith = Math.max(-Math.PI/2 + 0.05, Math.min(-Math.PI/2 + 0.2, contemplativeTargetZenith));
+  }
+  
+  contemplativeTargetDistance = Math.max(40, Math.min(180, contemplativeTargetDistance));
+}
+
+function updateContemplativeCamera() {
+  if (!CONTEMPLATIVE_MODE) return;
+  
+  contemplativePhase += CONTEMPLATIVE_SPEED * Math.max(0.05, TIME_SCALE * 0.05);
+  
+  if (Math.random() < 0.002 * Math.max(0.05, TIME_SCALE * 0.05)) {
+    setNewContemplativeTarget();
+  }
+  
+  const smoothFactor = CENITAL_SMOOTHING;
+  contemplativeAzimuthAngle += (contemplativeTargetAzimuth - contemplativeAzimuthAngle) * smoothFactor;
+  contemplativeZenithAngle += (contemplativeTargetZenith - contemplativeZenithAngle) * smoothFactor * 0.4;
+  contemplativeDistance += (contemplativeTargetDistance - contemplativeDistance) * smoothFactor * 0.3;
+  
+  const humanTremor = 0.0001;
+  contemplativeAzimuthAngle += (Math.random() * humanTremor - humanTremor/2);
+  contemplativeZenithAngle += (Math.random() * humanTremor/4 - humanTremor/8);
+  
+  const x = contemplativeDistance * Math.cos(contemplativeZenithAngle) * Math.cos(contemplativeAzimuthAngle);
+  const y = contemplativeDistance * Math.sin(contemplativeZenithAngle);
+  const z = contemplativeDistance * Math.cos(contemplativeZenithAngle) * Math.sin(contemplativeAzimuthAngle);
+  
+  const targetPosition = new THREE.Vector3(x, y, z);
+  camera.position.lerp(targetPosition, SMOOTHING_FACTOR * 0.2);
+  
+  const lookAtTarget = new THREE.Vector3(
+    Math.sin(contemplativePhase * 0.02) * 0.5,
+    Math.cos(contemplativePhase * 0.025) * 0.3,
+    Math.sin(contemplativePhase * 0.018) * 0.5
+  );
+  
+  camera.lookAt(lookAtTarget);
+}
+
+function setAccelerationMode(mode) {
+  if (AUTO_ACCELERATION_INTERVAL) {
+    clearInterval(AUTO_ACCELERATION_INTERVAL);
+    AUTO_ACCELERATION_INTERVAL = null;
+  }
+  
+  document.querySelectorAll('#timeControls button:not(#contemplativeBtn)').forEach(btn => {
+    btn.classList.remove('active');
+  });
+  
+  ACCELERATION_MODE = mode;
+  
+  switch(mode) {
+    case 'aureo':
+      document.getElementById('aureoBtn').classList.add('active');
+      console.log('Modo Áureo activado');
+      break;
+      
+    case 'auto':
+      document.getElementById('autoBtn').classList.add('active');
+      AUTO_SPEED_MULTIPLIER = 1;
+      AUTO_ACCELERATION_INTERVAL = setInterval(() => {
+        TIME_SCALE *= 1.5;
+        AUTO_SPEED_MULTIPLIER *= 1.5;
+        updateTimeScaleDisplay();
+      }, 7000);
+      console.log('Modo Automático activado');
+      break;
+      
+    case 'global':
+      document.getElementById('globalBtn').classList.add('active');
+      console.log('Modo Global activado');
+      break;
+      
+    case 'slow':
+      document.getElementById('slowBtn').classList.add('active');
+      console.log('Modo Desaceleración activado');
+      break;
+  }
+}
+
+function handleAcceleration() {
+  switch(ACCELERATION_MODE) {
+    case 'aureo':
+      TIME_SCALE *= PHI;
+      break;
+    case 'global':
+      TIME_SCALE *= 2;
+      break;
+    case 'slow':
+      TIME_SCALE /= 2;
+      if (TIME_SCALE < 0.0625) {
+        TIME_SCALE = 0.0625;
+      }
+      break;
+    case 'auto':
+      if (AUTO_ACCELERATION_INTERVAL) {
+        clearInterval(AUTO_ACCELERATION_INTERVAL);
+        AUTO_ACCELERATION_INTERVAL = null;
+      } else {
+        AUTO_ACCELERATION_INTERVAL = setInterval(() => {
+          TIME_SCALE *= 1.5;
+          updateTimeScaleDisplay();
+        }, 7000);
+      }
+      break;
+  }
+  updateTimeScaleDisplay();
+}
+
+function updateTimeScaleDisplay() {
+  document.getElementById('timeScaleDisplay').innerText = TIME_SCALE.toFixed(1) + 'x';
+}
+
+function animate() {
+  requestAnimationFrame(animate);
+  
+  SIM_TIME += 0.005 * TIME_SCALE;
+  
+  const now = new Date();
+  document.getElementById('clock').innerText = now.toLocaleTimeString();
+
+  rete.visible = document.getElementById('showRete').checked;
+  limbo.visible = document.getElementById('showLimbo').checked;
+  ecliptic.visible = document.getElementById('showEcliptic').checked;
+
+  const audioData = getAudioData();
+  
+  if (AUDIO_REACTIVE && audioData.average > 0) {
+    document.getElementById('audioVisualizer').style.display = 'block';
+    document.getElementById('audioBar').style.width = (audioData.average * 100) + '%';
+  }
+
+  updateContemplativeCamera();
+
+  Object.keys(bodies).forEach(id => {
+    const b = bodies[id];
+    
+    const speed = 0.5 * Math.pow(PHI, 4 - b.idx);
+    const azimut = SIM_TIME * speed;
+    
+    const solarCycleDays = 365.25;
+    const tropicCycleNormalized = (SIM_TIME / solarCycleDays) * (b.tropicPeriod / solarCycleDays);
+    
+    const tropicAngleMax = THREE.MathUtils.degToRad(23.5);
+    const cenitalAngle = tropicAngleMax * Math.sin(2 * Math.PI * tropicCycleNormalized);
+    
+    const aureoFreq = PHI / b.tropicPeriod;
+    const pulsoAureo = Math.sin((SIM_TIME + b.aureoPhase) * aureoFreq * PHI);
+    
+    const baseNadir = (b.idx / 8) * (Math.PI / 2.5) * ORBITAL_SEPARATION;
+    const nadirModulation = cenitalAngle * (1 + pulsoAureo * 0.2);
+    const nadir = baseNadir + nadirModulation;
+
+    const r = b.radius * (1 + pulsoAureo * 0.03);
+
+    const x = r * Math.cos(nadir) * Math.cos(azimut);
+    const y = r * Math.sin(nadir);
+    const z = r * Math.cos(nadir) * Math.sin(azimut);
+
+    b.mesh.position.set(x, y, z);
+
+    if (AUDIO_REACTIVE && audioData.average > 0) {
+      const audioBoost = 1 + (audioData.average * AUDIO_SENSITIVITY * 2.0);
+      const bassBoost = 1 + (audioData.bass * AUDIO_SENSITIVITY * 3.0);
+      
+      b.mesh.material.emissiveIntensity = COLOR_PALETTES[CURRENT_PALETTE].emissive * 
+                                          COLOR_INTENSITY * audioBoost * bassBoost;
+      
+      const scaleBoost = 1 + (audioData.bass * AUDIO_SENSITIVITY * 0.3);
+      b.mesh.scale.set(scaleBoost, scaleBoost, scaleBoost);
+      
+      if (id === 'sun') {
+        sunLight.intensity = 2 + (audioData.average * AUDIO_SENSITIVITY * 5) + 
+                            (audioData.bass * AUDIO_SENSITIVITY * 3) +
+                            (audioData.peak * AUDIO_SENSITIVITY * 2);
+        
+        if (audioData.peak > 0.7) {
+          const hue = (audioData.peak * 60) + 30;
+          sunLight.color.setHSL(hue / 360, 0.8, 0.6);
+        } else {
+          sunLight.color.setHex(0xffffff);
+        }
+      }
+      
+      b.trailLine.material.opacity = COLOR_PALETTES[CURRENT_PALETTE].trail * 
+                                     TRAIL_OPACITY * COLOR_INTENSITY * 
+                                     (1 + audioData.mid * AUDIO_SENSITIVITY * 0.5);
+    } else {
+      b.mesh.material.emissiveIntensity = COLOR_PALETTES[CURRENT_PALETTE].emissive * COLOR_INTENSITY;
+      b.mesh.scale.set(1, 1, 1);
+      b.trailLine.material.opacity = COLOR_PALETTES[CURRENT_PALETTE].trail * 
+                                     TRAIL_OPACITY * COLOR_INTENSITY;
+      
+      if (id === 'sun') {
+        sunLight.intensity = 2;
+        sunLight.color.setHex(0xffffff);
+      }
+    }
+
+    if (b.trailVisible) {
+      b.trailPoints.push(new THREE.Vector3(x, y, z));
+      
+      if (b.trailPoints.length > TRAIL_LENGTH) {
+        b.trailPoints.splice(0, b.trailPoints.length - TRAIL_LENGTH);
+      }
+      
+      b.trailLine.geometry.setFromPoints(b.trailPoints);
+    }
+
+    if (id === 'sun') sunLight.position.set(x, y, z);
+  });
+
+  rete.rotation.y += 0.001;
+  limbo.rotation.y += 0.001;
+
+  if (!CONTEMPLATIVE_MODE) {
+    controls.update();
+  }
+  
+  renderer.render(scene, camera);
+}
+
+
+document.querySelectorAll('[data-palette]').forEach(btn => {
+  btn.onclick = () => {
+    document.querySelectorAll('[data-palette]').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    CURRENT_PALETTE = btn.dataset.palette;
+    applyPalette(CURRENT_PALETTE);
+  };
+});
+
+
+document.getElementById('colorIntensity').oninput = (e) => {
+  COLOR_INTENSITY = parseFloat(e.target.value) / 100;
+  document.getElementById('colorIntensityValue').innerText = e.target.value + '%';
+  applyPalette(CURRENT_PALETTE);
+  updateMaterials();
+};
+
+
+document.getElementById('trailLength').oninput = (e) => {
+  TRAIL_LENGTH = parseInt(e.target.value);
+  document.getElementById('trailLengthValue').innerText = e.target.value;
+  
+
+  Object.keys(bodies).forEach(id => {
+    const b = bodies[id];
+    if (b.trailPoints.length > TRAIL_LENGTH) {
+      b.trailPoints.splice(0, b.trailPoints.length - TRAIL_LENGTH);
+      b.trailLine.geometry.setFromPoints(b.trailPoints);
+    }
+  });
+};
+
+
+document.getElementById('trailOpacity').oninput = (e) => {
+  TRAIL_OPACITY = parseFloat(e.target.value) / 100;
+  document.getElementById('trailOpacityValue').innerText = e.target.value + '%';
+  applyPalette(CURRENT_PALETTE);
+};
+
+
+document.getElementById('orbitalSeparation').oninput = (e) => {
+  ORBITAL_SEPARATION = parseFloat(e.target.value);
+  document.getElementById('orbitalSeparationValue').innerText = e.target.value;
+};
+
+
+document.querySelectorAll('[data-intensity]').forEach(btn => {
+  btn.onclick = () => {
+    document.querySelectorAll('[data-intensity]').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    COLOR_INTENSITY_LEVEL = btn.dataset.intensity;
+    applyPalette(CURRENT_PALETTE);
+  };
+});
+
+
+document.getElementById('audioReactive').onchange = (e) => {
+  AUDIO_REACTIVE = e.target.checked;
+  if (AUDIO_REACTIVE) {
+    initAudioContext();
+  }
+};
+
+
+document.getElementById('audioSensitivity').oninput = (e) => {
+  AUDIO_SENSITIVITY = parseFloat(e.target.value) / 100;
+  document.getElementById('audioSensitivityValue').innerText = e.target.value + '%';
+};
+
+
+document.getElementById('musicFile').onchange = (e) => {
+  const file = e.target.files[0];
+  if (file) {
+    initAudioContext();
+    
+    if (musicElement) {
+      musicElement.pause();
+      musicElement.remove();
+    }
+    
+    musicElement = new Audio(URL.createObjectURL(file));
+    musicElement.loop = true;
+    
+    if (audioSource) {
+      audioSource.disconnect();
+    }
+    
+    audioSource = audioContext.createMediaElementSource(musicElement);
+    audioSource.connect(audioAnalyser);
+    audioAnalyser.connect(audioContext.destination);
+    
+    document.getElementById('playMusicBtn').disabled = false;
+    document.getElementById('stopMusicBtn').disabled = false;
+    
+    console.log('Música cargada:', file.name);
+  }
+};
+
+
+document.getElementById('playMusicBtn').onclick = () => {
+  if (musicElement && audioContext) {
+    if (audioContext.state === 'suspended') {
+      audioContext.resume();
+    }
+    
+    if (isMusicPlaying) {
+      musicElement.pause();
+      isMusicPlaying = false;
+      document.getElementById('playMusicBtn').innerText = '▶️ Play';
+    } else {
+      musicElement.play();
+      isMusicPlaying = true;
+      document.getElementById('playMusicBtn').innerText = '⏸ Pause';
+    }
+  }
+};
+
+
+document.getElementById('stopMusicBtn').onclick = () => {
+  if (musicElement) {
+    musicElement.pause();
+    musicElement.currentTime = 0;
+    isMusicPlaying = false;
+    document.getElementById('playMusicBtn').innerText = '▶️ Play';
+  }
+};
+
+
+document.getElementById('aureoBtn').onclick = () => {
+  if (ACCELERATION_MODE !== 'aureo') {
+    setAccelerationMode('aureo');
+  } else {
+    handleAcceleration();
+  }
+  resetTimeControlsTimer();
+};
+
+document.getElementById('autoBtn').onclick = () => {
+  if (ACCELERATION_MODE !== 'auto') {
+    setAccelerationMode('auto');
+  } else {
+    handleAcceleration();
+  }
+  resetTimeControlsTimer();
+};
+
+document.getElementById('globalBtn').onclick = () => {
+  if (ACCELERATION_MODE !== 'global') {
+    setAccelerationMode('global');
+  } else {
+    handleAcceleration();
+  }
+  resetTimeControlsTimer();
+};
+
+document.getElementById('slowBtn').onclick = () => {
+  if (ACCELERATION_MODE !== 'slow') {
+    setAccelerationMode('slow');
+  } else {
+    handleAcceleration();
+  }
+  resetTimeControlsTimer();
+};
+
+
+document.getElementById('contemplativeBtn').onclick = () => {
+  toggleContemplativeMode();
+  resetTimeControlsTimer();
+};
+
+
+document.getElementById('uiToggleBtn').onclick = toggleUI;
+
+
+document.getElementById('timeControlsToggleBtn').onclick = toggleTimeControls;
+
+
+document.getElementById('fullscreenBtn').onclick = () => {
+  if (!document.fullscreenElement) {
+    document.documentElement.requestFullscreen().then(() => {
+      isFullscreen = true;
+      document.getElementById('fullscreenBtn').innerText = '⛶';
+    }).catch(err => {
+      console.log(`Error al entrar en pantalla completa: ${err.message}`);
+    });
+  } else {
+    document.exitFullscreen().then(() => {
+      isFullscreen = false;
+      document.getElementById('fullscreenBtn').innerText = '⛶';
+    });
+  }
+};
+
+
+document.addEventListener('fullscreenchange', () => {
+  if (!document.fullscreenElement) {
+    isFullscreen = false;
+    document.getElementById('fullscreenBtn').innerText = '⛶';
+  }
+});
+
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'F11') {
+    e.preventDefault();
+    document.getElementById('fullscreenBtn').click();
+  }
+});
+
+
+document.addEventListener('mousemove', (e) => {
+  resetUITimer();
+  resetTimeControlsTimer();
+});
+
+
+let lastCameraPosition = camera.position.clone();
+let lastCameraTarget = controls.target.clone();
+
+setInterval(() => {
+  const cameraMoved = !camera.position.equals(lastCameraPosition) || 
+                     !controls.target.equals(lastCameraTarget);
+  
+  if (cameraMoved) {
+    resetUITimer();
+    resetTimeControlsTimer();
+    lastCameraPosition.copy(camera.position);
+    lastCameraTarget.copy(controls.target);
+  }
+}, 100);
+
+
+window.addEventListener('resize', () => {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+});
+
+
+document.getElementById('skipTutorialBtn').onclick = () => {
+  document.getElementById('tutorialOverlay').style.opacity = '0';
+  setTimeout(() => {
+    document.getElementById('tutorialOverlay').style.display = 'none';
+  }, 500);
+  setAccelerationMode('global');
+  applyPalette(CURRENT_PALETTE);
+  animate();
+};
+
+document.getElementById('startTutorialBtn').onclick = () => {
+  document.getElementById('tutorialOverlay').style.opacity = '0';
+  setTimeout(() => {
+    document.getElementById('tutorialOverlay').style.display = 'none';
+  }, 500);
+  setAccelerationMode('global');
+  applyPalette(CURRENT_PALETTE);
+  animate();
+  
+
+  setTimeout(() => {
+    if (!timeControlsVisible) {
+      toggleTimeControls();
+    }
+  }, 3000);
+};
+
+
+setAccelerationMode('global');
+resetUITimer();
+resetTimeControlsTimer();
+applyPalette(CURRENT_PALETTE);
+</script>
+</body>
+</html>
+
+// Oculus Geometry — Public Demo v1.0.7
+// © 2025 Cristian Valeria Bravo — Hermetica Labs
