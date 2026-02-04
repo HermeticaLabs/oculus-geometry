@@ -1,67 +1,83 @@
-> Versión en español disponible en README.md
-
 # Oculus Geometry
 
-**Oculus Geometry** is an interactive and contemplative visual instrument focused on geometry, time, and mathematical motion.
+*Interactive and contemplative visual instrument*
 
-The project functions as a living perceptual piece: a space where forms, orbits, and numerical relationships unfold without imposed narrative, inviting observation, pause, and personal interpretation.
+---
 
-This repository corresponds to an open demonstrative version, intended to:
+## Description
 
-- Document the visual behavior of the system  
-- Share an interactive geometric experience  
-- Serve as an experimental and contemplative foundation  
+**Oculus Geometry** is an interactive visual instrument focused on the exploration of geometry, time, and mathematical motion. It operates as a living perceptual piece: a space where forms, orbits, and numerical relationships unfold without imposed narrative, inviting observation, pause, and personal interpretation.
 
-The conceptual and evolutionary core of the system is part of a broader line of research and is not exposed in this repository.
+The system does not aim to represent physical phenomena nor to optimize immediate visual impact. Instead, it prioritizes structural coherence, temporal reproducibility, and contemplative experience.
+
+---
+
+## Repository Scope
+
+This repository corresponds to a **demonstrative and open version** of the project. Its purpose is to:
+
+* Document the visual behavior of the system
+* Share an interactive geometric experience
+* Serve as an experimental and contemplative base
+
+The **conceptual and evolutionary core** of *Oculus Geometry* belongs to a broader line of research and **is intentionally not exposed** in this repository.
+
+This repository represents a **conscious boundary**, not the complete instrument.
 
 ---
 
 ## Concept
 
-Oculus Geometry explores:
+*Oculus Geometry* explores:
 
-- Geometric relationships driven by mathematical constants  
-- Time as a scalable and perceptual parameter  
-- Visual coherence through minimal interaction  
-- Long-term reproducibility over immediate effects  
+* Geometric relationships driven by mathematical constants
+* Time as a scalable and perceptual parameter
+* Visual coherence through minimal interaction
+* Long-term reproducibility over immediate effects
 
-The project prioritizes structural clarity over feature accumulation.
-
----
-
-## Status
-
-- Public demo: **available**  
-- System core: **intentionally absent**  
-- Architecture: **designed for long-term growth**  
-
-This repository represents a **boundary**, not the complete instrument.
+The project prioritizes structural clarity over the accumulation of features.
 
 ---
 
-## Authorship and License
+## Project Status
 
-**Oculus Geometry**  
-© 2025 Cristian Valeria Bravo  
-
-Developed under the *Hermetica Labs* project.
-
-Licensed under **Creative Commons BY-NC-ND 4.0**
-
-Permitted:
-- Viewing and executing the code  
-
-Not permitted:
-- Modifying the work  
-- Commercial use  
-- Redistribution of derivative versions  
-
-Without explicit authorization from the author.
+* **Public demo:** available
+* **System core:** intentionally absent
+* **Architecture:** designed for long-term growth
 
 ---
 
-## Notes
+## Authorship
 
-This project is part of an ongoing line of research.  
-Documentation and scope may evolve over time.
-ation and scope may evolve, but authorship and intent remain constant.
+**Oculus Geometry**
+© 2025–2026 Cristian Valeria Bravo
+Developed under the **Hermetica Labs** project
+
+---
+
+## License
+
+This project is distributed under the following license:
+
+**Creative Commons Attribution–NonCommercial–NoDerivatives 4.0 International**
+(CC BY-NC-ND 4.0)
+
+### Permitted:
+
+* Viewing and executing the code
+* Sharing the work unmodified, with attribution
+
+### Not permitted:
+
+* Commercial use
+* Modification of the work
+* Redistribution of derivative versions
+
+Any use not explicitly covered by this license requires prior authorization from the author.
+
+---
+
+## Note
+
+*Oculus Geometry* should not be interpreted as a library, a generic visualizer, or a scientific simulation. It is an **algorithmic contemplative instrument**, conceived to be observed rather than controlled, and tuned rather than optimized.
+
